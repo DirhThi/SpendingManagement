@@ -1,20 +1,54 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {  StyleSheet } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as SplashScreen from 'expo-splash-screen';
+import useFonts from './useFonts';
+import Navigation from './navigation/RootNavigator';
+import { NativeBaseProvider, Box, StatusBar } from 'native-base';
+import theme from './configs/theme';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(true);
+
+  useEffect(() => {
+    async function loadFontsAndAssets() {
+      await useFonts(); 
+      // Load custom fonts
+      await SplashScreen.preventAutoHideAsync(); 
+      // Prevent splash screen from hiding
+      // Load any additional assets here
+      await SplashScreen.hideAsync(); 
+      // Hide the splash screen
+      setFontsLoaded(true); 
+      // Set the fontsLoaded flag to true
+    }
+    loadFontsAndAssets();
+  }, []);
+
+  if (!fontsLoaded) {
+    return null; 
+    // Return null until the custom fonts and assets are loaded
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+  <SafeAreaProvider>
+    <NativeBaseProvider theme={theme}>
+        <Navigation />
+        <StatusBar translucent />
+    </NativeBaseProvider>
+  </SafeAreaProvider>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  box: {
+    width: '100%',
+    height: 100,
+    backgroundColor: '#e6e6e6',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
 });
