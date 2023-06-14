@@ -2,7 +2,6 @@ import { View, Text, Select, Input } from "native-base";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { FontAwesome5, AntDesign } from "@expo/vector-icons";
-import DatePicker from "react-native-date-picker";
 function AddTranSactionScreen({ navigation }) {
   const [transaction, setTransaction] = useState("chitieu");
   const [category, setCategory] = useState("");
