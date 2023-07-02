@@ -6,7 +6,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { useContext } from 'react';
 import AuthContext from '../../../navigation/AuthContext';
 import NAVIGATION_KEY from '../../../constans/NavigationKey';
-const UserScreen = () => {
+const UserScreen = ({navigation}) => {
   const {currentUser,logout } = useContext(AuthContext);
   
   const handleLogout =() => {
@@ -40,7 +40,7 @@ const UserScreen = () => {
          
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ width:'100%' , justifyContent:'space-between',flexDirection: 'row', alignItems: 'center'  }}>
+        <TouchableOpacity onPress={() => navigation.navigate('changepassword')} style={{ width:'100%' , justifyContent:'space-between',flexDirection: 'row', alignItems: 'center'  }}>
         <View flexDirection={'row'}>
           <MaterialCommunityIcons name="lock-reset" size={24} color="#1FA97C" />
           <Text fontSize={15} style={{ marginLeft: 20 }}>Đổi mật khẩu</Text>
