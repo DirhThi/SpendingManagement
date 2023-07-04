@@ -2,10 +2,68 @@ import { Text, View } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export default function lastMonth() {
-    const navigation=useNavigation();
+  const navigation = useNavigation();
+  const [totalThuNhap, setTotalThuNhap] = useState(0);
+  const [totalChiTieu, setTotalChiTieu] = useState(0);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const db = getFirestore();
+        const transactionsRef = collection(db, 'transaction');
+
+        // Calculate total Thu nhập
+        const thuNhapQuery = query(
+          transactionsRef,
+          where('userId', '==', getCurrentUserId()),
+          where('month', '==', 7),
+          where('year', '==', 2023),
+          where('transactionType', '==', 'thunhap')
+        );
+        const thuNhapQuerySnapshot = await getDocs(thuNhapQuery);
+        let totalThuNhap = 0;
+        thuNhapQuerySnapshot.forEach((doc) => {
+          const transaction = doc.data();
+          const amount = parseFloat(transaction.amount);
+          totalThuNhap += amount;
+        });
+        setTotalThuNhap(totalThuNhap);
+
+        // Calculate total Chi tiêu
+        const chiTieuQuery = query(
+          transactionsRef,
+          where('userId', '==', getCurrentUserId()),
+          where('month', '==', 7),
+          where('year', '==', 2023),
+          where('transactionType', '==', 'chitieu')
+        );
+        const chiTieuQuerySnapshot = await getDocs(chiTieuQuery);
+        let totalChiTieu = 0;
+        chiTieuQuerySnapshot.forEach((doc) => {
+          const transaction = doc.data();
+          const amount = parseFloat(transaction.amount);
+          totalChiTieu += amount;
+        });
+        setTotalChiTieu(totalChiTieu);
+      } catch (error) {
+        console.log('Error retrieving transactions:', error);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const getCurrentUserId = () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    return currentUser ? currentUser.uid : '';
+  };
+
   return (
     <View pt={2} pl={4} pr={4} flex={1}>
       <View
@@ -22,7 +80,7 @@ export default function lastMonth() {
             Thu nhập
           </Text>
           <Text fontWeight={"medium"} color={"#1FA97C"}>
-            {"+"} 3.000.000 đ
+            {"+"} {totalThuNhap} đ
           </Text>
         </View>
         <View
@@ -31,18 +89,17 @@ export default function lastMonth() {
           alignItems={"center"}
           justifyContent={"space-between"}
         >
-          <Text fontWeight={"medium"} color={"#1FA97C"}>
+          <Text fontWeight={"medium"} color={"red.500"}>
             Chi tiêu
           </Text>
           <Text fontWeight={"medium"} color={"red.500"}>
-            {" "}
-            {"-"}2.000.000 đ
+            {"-"} {totalChiTieu} đ
           </Text>
         </View>
         <View alignSelf={"flex-end"}>
           <Text margin={-2}>────────</Text>
           <Text fontWeight={"medium"} alignSelf={"flex-end"}>
-            1.000.000 đ
+            {totalThuNhap - totalChiTieu} đ
           </Text>
         </View>
       </View>
