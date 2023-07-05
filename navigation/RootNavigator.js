@@ -14,6 +14,7 @@ import AddTranSactionScreen from "../src/screens/AddTransaction/addtransaction";
 import AuthContext from "./AuthContext";
 import { useContext } from 'react';
 import ChangeAccountScreen from "../src/screens/User/changepassword";
+import Wallet from "../src/screens/User/wallet";
 export default function Navigation() {
   // hooks
   //const [isAppReady, setAppReady] = useState(false);
@@ -127,6 +128,15 @@ function RootNavigator({navigation}) {
         }}
         name="changepassword"
         component={ChangeAccountScreen}
+      />
+        <Stack.Screen
+        options={{
+          headerTitle: "Ví",
+          headerBackTitle: "Trở về",
+          headerBackTitleVisible: true,
+        }}
+        name="wallet"
+        component={Wallet}
       />
     </Stack.Navigator>
   );

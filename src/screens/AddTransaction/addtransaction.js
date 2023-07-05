@@ -21,6 +21,7 @@ function AddTransactionScreen({ navigation }) {
   const [day, setDay] = useState('');
 const [month, setMonth] = useState('');
 const [year, setYear] = useState('');
+
   const inputRef = useRef(null);
 
   useEffect(() => {

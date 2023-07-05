@@ -48,7 +48,7 @@ const UserScreen = ({navigation}) => {
      
         </TouchableOpacity>
 
-        <TouchableOpacity style={{width:'100%' , justifyContent:'space-between', flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity  onPress={() => navigation.navigate('wallet')} style={{width:'100%' , justifyContent:'space-between', flexDirection: 'row', alignItems: 'center'}}>
           <View flexDirection={'row'}>
           <MaterialCommunityIcons name="wallet" size={24} color="#1FA97C" />
           <Text fontSize={15} style={{ marginLeft: 20 }}>Ví</Text>
