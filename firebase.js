@@ -1,8 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, where,query ,getDocs,updateDoc} from 'firebase/firestore';
-
-
+import { getFirestore, collection, doc, setDoc, where,query ,getDocs,updateDoc, getDoc} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGjaDt6mnq7Yokox0wKBs6KotcGjrrDVs",
@@ -31,7 +29,8 @@ const createAccount = async (email, password, fullName) => {
     const userDocRef = doc(db, 'users', user.uid);
     await setDoc(userDocRef, {
       email: user.email,
-      fullName: fullName
+      fullName: fullName,
+      tienmat: null
     });
 
     console.log('User account created:', user);
@@ -115,6 +114,94 @@ const updatePasswordFunction = async (currentPassword, newPassword) => {
     throw error;
   }
 };
+export const getWalletInfo = async () => {
+  try {
+    const walletQuery = collection(db, 'wallet');
+    const walletSnapshot = await getDocs(walletQuery);
 
+    if (!walletSnapshot.empty) {
+      // Assuming you want to retrieve the first wallet document
+      const walletDoc = walletSnapshot.docs[0];
+      return walletDoc.data();
+    } else {
+      throw new Error('Wallet not found');
+    }
+  } catch (error) {
+    console.log('Error fetching wallet info:', error);
+    throw error;
+  }
+};
+
+export const getUserInfo = async () => {
+  try {
+    const walletQuery = collection(db, 'users');
+    const walletSnapshot = await getDocs(walletQuery);
+
+    if (!walletSnapshot.empty) {
+      // Assuming you want to retrieve the first wallet document
+      const walletDoc = walletSnapshot.docs[0];
+      return walletDoc.data();
+    } else {
+      throw new Error('Wallet not found');
+    }
+  } catch (error) {
+    console.log('Error fetching wallet info:', error);
+    throw error;
+  }
+};
+
+export const checkAndSetTienmat = async (mathe) => {
+  try {
+    const user = auth.currentUser;
+
+    if (!user) {
+      throw new Error('User not logged in');
+    }
+    
+    const email = user.email;
+
+    if (!email) {
+      throw new Error('User email not found');
+    }
+
+    const walletQuery = query(collection(db, 'users'), where('email', '==', email));
+    const walletSnapshot = await getDocs(walletQuery);
+
+    if (!walletSnapshot.empty) {
+      const walletDocRef = doc(db, 'users', walletSnapshot.docs[0].id);
+      await updateDoc(walletDocRef, { tienmat: mathe });
+      console.log('Tienmat updated successfully:', mathe);
+    } else {
+      throw new Error('User not found in the "users" collection');
+    }
+    await updateProfile(user, {
+      email: email
+    });
+    return email;
+  } catch (error) {
+    console.log('Error checking and setting email:', error);
+    throw error;
+  }
+};
+export const getTienMat = async () => {
+  try {
+    const user = auth.currentUser;
+
+    if (user) {
+      const userQuery = query(collection(db, 'users'), where('email', '==', user.email));
+      const userSnapshot = await getDocs(userQuery);
+
+      if (!userSnapshot.empty) {
+        const userData = userSnapshot.docs[0].data();
+        const tienMatValue = userData.tienmat;
+        // Sử dụng giá trị tienmat ở đây
+      }
+    } else {
+      console.log('Người dùng chưa đăng nhập');
+    }
+  } catch (error) {
+    console.log('Lỗi khi truy xuất giá trị tienmat:', error);
+  }
+};
 export { auth, createAccount, login, updateProfile, signOut, updateEmailInWallet, updatePasswordFunction };
 export { db };
