@@ -1,20 +1,23 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, getDocs, updateDoc, where ,query} from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { getFirestore, collection, doc, setDoc, where,query ,getDocs,updateDoc} from 'firebase/firestore';
+
+
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBlbdlxp30lzlLaldIq62HRpJhHqlTMDL4",
-  authDomain: "appt-ac877.firebaseapp.com",
-  projectId: "appt-ac877",
-  storageBucket: "appt-ac877.appspot.com",
-  messagingSenderId: "225961154918",
-  appId: "1:225961154918:web:fdced675880b955c6410a7",
-  measurementId: "G-RMS0E2MWV8"
+  apiKey: "AIzaSyAGjaDt6mnq7Yokox0wKBs6KotcGjrrDVs",
+  authDomain: "budgetapp-a60a6.firebaseapp.com",
+  projectId: "budgetapp-a60a6",
+  storageBucket: "budgetapp-a60a6.appspot.com",
+  messagingSenderId: "1053988743194",
+  appId: "1:1053988743194:web:a74254600d4416a5c1c9a3",
+  measurementId: "G-J4R67EZVST"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
 const createAccount = async (email, password, fullName) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -37,45 +40,27 @@ const createAccount = async (email, password, fullName) => {
     throw error;
   }
 };
-export const getWalletInfo = async (currentEmail) => {
-  try {
-    const walletRef = collection(db, 'wallet');
-    const q = query(walletRef, where('email', '==', currentEmail));
-    const querySnapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-      const walletData = querySnapshot.docs[0].data();
-      const ten = walletData.ten;
-      const soien = walletData.soien;
-      
-      console.log('Ten:', ten);
-      console.log('Soien:', soien);
-      
-      return { ten, soien };
-    } else {
-      console.log('No wallet found for the current email');
-      return null;
-    }
-  } catch (error) {
-    console.log('Error retrieving wallet info:', error);
-    throw error;
-  }
-};
-export const updateEmailInWallet = async (mathe, password, email) => {
+export const checkAndSetEmail = async (mathe, password) => {
   try {
-    const walletRef = collection(db, 'wallet');
-    const q = query(walletRef, where('mathe', '==', mathe), where('password', '==', password));
-    const querySnapshot = await getDocs(q);
+    const user = auth.currentUser;
 
-    if (!querySnapshot.empty) {
-      const docRef = querySnapshot.docs[0].ref;
-      await updateDoc(docRef, { email });
-      console.log('Email updated in the wallet collection');
-    } else {
-      console.log('No matching card code and password found');
+    if (!user) {
+      throw new Error('User not logged in');
     }
+    const email = user.email;
+
+    if (!email) {
+      throw new Error('User email not found');
+    }
+    await updateEmailInWallet(mathe, password, email);
+    await updateProfile(auth.currentUser, {
+      email: email
+    });
+
+    return email;
   } catch (error) {
-    console.log('Error updating email in wallet collection:', error);
+    console.log('Error checking and setting email:', error);
     throw error;
   }
 };
@@ -100,7 +85,25 @@ export const logout = async () => {
   }
 };
 
-const updatePassword = async (currentPassword, newPassword) => {
+const updateEmailInWallet = async (mathe, password, email) => {
+  try {
+    const walletQuery = query(collection(db, 'wallet'), where('mathe', '==', mathe));
+    const walletSnapshot = await getDocs(walletQuery);
+
+    if (!walletSnapshot.empty) {
+      const walletDocRef = doc(db, 'wallet', walletSnapshot.docs[0].id);
+      await updateDoc(walletDocRef, { email: email });
+      console.log('Email updated in wallet collection:', email);
+    } else {
+      throw new Error('Wallet not found');
+    }
+  } catch (error) {
+    console.log('Error updating email in wallet collection:', error);
+    throw error;
+  }
+};
+
+const updatePasswordFunction = async (currentPassword, newPassword) => {
   try {
     const user = auth.currentUser;
     const credential = EmailAuthProvider.credential(user.email, currentPassword);
@@ -113,5 +116,5 @@ const updatePassword = async (currentPassword, newPassword) => {
   }
 };
 
-export { auth, createAccount, login, updateProfile, signOut };
+export { auth, createAccount, login, updateProfile, signOut, updateEmailInWallet, updatePasswordFunction };
 export { db };

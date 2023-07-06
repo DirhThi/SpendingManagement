@@ -13,13 +13,12 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const user = await login(email, password);
-      if (user) {
-        console.log('Đăng nhập thành công:', user.email);
-        navigation.navigate(NAVIGATION_KEY.AppTabs);
-      } else {
-        console.log('Đăng nhập thất bại.');
-      }
+      await login(email, password);
+      alert('Đăng nhập thành công');
+      //navigation.navigate({ name: NAVIGATION_KEY.AppTabs, params: { screen: NAVIGATION_KEY.Home } });
+      // Navigate to the AppTabs screen within the AuthTabs navigator
+      // Thực hiện hành động sau khi đăng nhập thành công
+      navigation.navigate(NAVIGATION_KEY.AppTabs);
     } catch (error) {
       console.log('Error logging in:', error);
     }
