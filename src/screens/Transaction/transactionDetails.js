@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, Checkbox, Button, Modal, Input } from "native-base";
+import { View, Text, Checkbox, Button, Modal, Input, AlertDialog } from "native-base";
 import { useNavigation } from "@react-navigation/native";
-import { updateDoc, doc } from "firebase/firestore";
+import { updateDoc, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 
 function TransactionDetailsScreen({ route }) {
   const [edit, setEdit] = useState(false);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const { transaction,userID } = route.params;
-  
+  const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+  const { transaction, userID } = route.params;
+
   const navigation = useNavigation();
 
   const [editedTransaction, setEditedTransaction] = useState({
@@ -26,11 +27,8 @@ function TransactionDetailsScreen({ route }) {
 
   const handleSaveChanges = async () => {
     try {
-      // Update the transaction data in Firestore
-      console.log("Transaction ID:", transaction.userID);
-  
       const transactionRef = doc(db, "transactions", transaction.id);
-  
+
       const updatedFields = {
         amount: editedTransaction.amount,
         day: editedTransaction.day,
@@ -38,13 +36,34 @@ function TransactionDetailsScreen({ route }) {
         year: editedTransaction.year,
         note: editedTransaction.note,
       };
-  
+
       await updateDoc(transactionRef, updatedFields);
-  
+
       setModalVisible(false);
       console.log("Transaction updated successfully");
     } catch (error) {
       console.log("Error saving changes:", error);
+    }
+  };
+
+  const handleDeleteConfirmation = () => {
+    setDeleteConfirmationVisible(true);
+  };
+
+  const handleDeleteTransaction = async () => {
+    try {
+      const transactionRef = doc(db, "transactions", transaction.id);
+  
+      await deleteDoc(transactionRef);
+  
+      setDeleteConfirmationVisible(false);
+      console.log("Transaction deleted successfully");
+  
+      // Add any additional logic after deleting the transaction
+      // For example, navigate to another screen
+      // navigation.navigate('OtherScreen');
+    } catch (error) {
+      console.log("Error deleting transaction:", error);
     }
   };
 
@@ -70,7 +89,7 @@ function TransactionDetailsScreen({ route }) {
               <Text onPress={handleEditClick} mr={2} color="gray.600" fontWeight="medium" fontSize={20}>
                 Chỉnh sửa
               </Text>
-              <Text mr={2} color="gray.600" fontWeight="medium" fontSize={20}>
+              <Text mr={2} color="gray.600" fontWeight="medium" fontSize={20} onPress={handleDeleteConfirmation}>
                 Xóa
               </Text>
             </View>
@@ -175,7 +194,7 @@ function TransactionDetailsScreen({ route }) {
               value={editedTransaction.note}
               onChangeText={(value) =>
                 setEditedTransaction((prev) => ({
-                  ...prev,
+                 ...prev,
                   note: value,
                 }))
               }
@@ -189,6 +208,20 @@ function TransactionDetailsScreen({ route }) {
           </Modal.Footer>
         </Modal.Content>
       </Modal>
+
+      {/* Delete confirmation alert */}
+      <AlertDialog isOpen={deleteConfirmationVisible} leastDestructiveRef={undefined} onClose={() => setDeleteConfirmationVisible(false)}>
+        <AlertDialog.Content>
+          <AlertDialog.Header>Xác nhận xóa</AlertDialog.Header>
+          <AlertDialog.Body>Bạn có chắc chắn muốn xóa giao dịch này?</AlertDialog.Body>
+          <AlertDialog.Footer>
+            <Button onPress={() => setDeleteConfirmationVisible(false)}>Hủy</Button>
+            <Button colorScheme="danger" onPress={handleDeleteTransaction}>
+              Xóa
+            </Button>
+          </AlertDialog.Footer>
+        </AlertDialog.Content>
+      </AlertDialog>
     </View>
   );
 }

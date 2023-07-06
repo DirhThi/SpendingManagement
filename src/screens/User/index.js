@@ -56,10 +56,10 @@ const UserScreen = ({navigation}) => {
      
         </TouchableOpacity>
 
-        <TouchableOpacity style={{width:'100%' , justifyContent:'space-between', flexDirection: 'row', alignItems: 'center'  }}>
+        <TouchableOpacity onPress={() => navigation.navigate('tienmat')} style={{width:'100%' , justifyContent:'space-between', flexDirection: 'row', alignItems: 'center'  }}>
         <View flexDirection={'row'}>
           <MaterialCommunityIcons name="cash" size={24} color="#1FA97C" />
-          <Text fontSize={15} style={{ marginLeft: 20 }}>Hạn mức chi tiêu</Text>
+          <Text fontSize={15} style={{ marginLeft: 20 }}>Tiền mặt</Text>
           </View>
      
         </TouchableOpacity>
