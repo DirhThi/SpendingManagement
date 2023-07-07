@@ -21,7 +21,7 @@ const UserScreen = ({navigation}) => {
     <View style={{ flex: 1 }}>
       <View  borderBottomLeftRadius={35} borderBottomRightRadius={30} style={{ paddingBottom:10,paddingTop: 10, alignItems: 'center' }}>
         <Image
-          source={require('../../../assets/images/CompanyName.png')}
+          source={require('../../../assets/images/123.png')}
           style={{ width: 100, height: 100, borderRadius: 50 }}
           accessibilityLabel="User Avatar"
         />

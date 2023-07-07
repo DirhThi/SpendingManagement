@@ -90,8 +90,7 @@ const [year, setYear] = useState('');
   return (
     <View flex={1}>
       <View
-        pl={4}
-        pr={4}
+        py={4}
         pb={2}
         justifyContent={'space-between'}
         alignItems={'flex-end'}
@@ -101,8 +100,9 @@ const [year, setYear] = useState('');
         shadow={2}
       >
         <Text
+          px={4}
           onPress={() => navigation.goBack()}
-          fontWeight={'semibold'}
+          fontWeight={'normal'}
           color={'red.500'}
           fontSize={18}
         >
@@ -112,8 +112,9 @@ const [year, setYear] = useState('');
           Thêm giao dịch
         </Text>
         <Text
+          px={4}
           onPress={() => navigation.goBack()}
-          fontWeight={'semibold'}
+          fontWeight={'normal'}
           color={'red.500'}
           fontSize={20}
         >
@@ -126,7 +127,7 @@ const [year, setYear] = useState('');
             <Select
               variant="unstyled"
               w={'50%'}
-              fontWeight={'extrabold'}
+              fontWeight={'semibold'}
               color={'#767676'}
               fontSize={20}
               selectedValue={transaction}
@@ -165,7 +166,7 @@ const [year, setYear] = useState('');
             <Select
               variant="rounded"
               placeholder="Chọn danh mục"
-              fontWeight={'extrabold'}
+              fontWeight={'normal'}
               color={'#767676'}
               fontSize={16}
               selectedValue={category}
@@ -182,7 +183,7 @@ const [year, setYear] = useState('');
             <Select
               variant="rounded"
               placeholder="Chọn danh mục"
-              fontWeight={'extrabold'}
+              fontWeight={'normal'}
               color={'#767676'}
               fontSize={16}
               selectedValue={category}
@@ -201,7 +202,7 @@ const [year, setYear] = useState('');
           <Select
             variant="rounded"
             placeholder="Chọn ví thanh toán"
-            fontWeight={'extrabold'}
+            fontWeight={'normal'}
             color={'#767676'}
             fontSize={16}
             selectedValue={paymentWallet}

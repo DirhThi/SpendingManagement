@@ -59,7 +59,7 @@ export default function LastMonth() {
   return (
     <ScrollView>
       <View pt={2} pl={4} pr={4} flex={1}>
-        <View pl={4} pr={4} pt={2} pb={2} borderRadius={10} backgroundColor="white" height={86}>
+        <View p={4} borderRadius={10} backgroundColor="white" height={120 }>
           <View flex={1} flexDirection="row" justifyContent="space-between">
             <Text fontWeight="medium" color="#1FA97C">
               Thu nhập
@@ -84,7 +84,7 @@ export default function LastMonth() {
           </View>
         </View>
         <View>
-          <View alignItems="flex-end" mt={4} mb={2} justifyContent="space-between" flexDirection="row">
+          <View alignItems="flex-end" mt={4} justifyContent="space-between" flexDirection="row">
             <Text mr={2} color="gray.600" fontWeight="medium" fontSize={14}>
               Danh sách giao dịch
             </Text>

@@ -7,12 +7,61 @@ import {
   Select,
   HStack,
 } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExpenReportScreen from "./expenreport";
 import IncomeReportScreen from "./incomereport";
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { getAuth } from 'firebase/auth';
+
 function MonthReportDetails() {
-  const [transaction, setTransaction] = useState("tatca");
+  const [transactions, setTransactions] = useState([]);
   const [index, setindex] = useState(0);
+  const [totalThuNhap, setTotalThuNhap] = useState(0);
+  const [totalChiTieu, setTotalChiTieu] = useState(0);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const db = getFirestore();
+        const transactionsRef = collection(db, 'transaction');
+
+        // Fetch transactions for the month of July 2023
+        const transactionsQuery = query(
+          transactionsRef,
+          where('userId', '==', getCurrentUserId()),
+          where('month', '==', 7),
+          where('year', '==', 2023)
+        );
+        const transactionsQuerySnapshot = await getDocs(transactionsQuery);
+        const transactionsData = transactionsQuerySnapshot.docs.map((doc) => doc.data());
+        setTransactions(transactionsData);
+
+        // Calculate total Thu nhập and total Chi tiêu
+        let totalThuNhap = 0;
+        let totalChiTieu = 0;
+        transactionsData.forEach((transaction) => {
+          const amount = parseFloat(transaction.amount);
+          if (transaction.transactionType === 'thunhap') {
+            totalThuNhap += amount;
+          } else if (transaction.transactionType === 'chitieu') {
+            totalChiTieu += amount;
+          }
+        });
+        setTotalThuNhap(totalThuNhap);
+        setTotalChiTieu(totalChiTieu);
+      } catch (error) {
+        console.log('Error retrieving transactions:', error);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const getCurrentUserId = () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    return currentUser ? currentUser.uid : '';
+  };
 
   return (
     <View pl={4} pr={4} pt={2} flex={1}>
@@ -32,8 +81,8 @@ function MonthReportDetails() {
           w={"100%"}
           h={10}
           fontSize={20}
-          selectedValue={transaction}
-          onValueChange={(itemValue) => setTransaction(itemValue)}
+          selectedValue={transactions}
+          onValueChange={(itemValue) => setTransactions(itemValue)}
         >
           <Select.Item label="Tất cả" value="tatca" />
           <Select.Item label="Agribank" value="nganhang1" />
@@ -52,7 +101,7 @@ function MonthReportDetails() {
               Thu nhập :
             </Text>
             <Text lab color={"green.700"} fontSize={16}>
-              2.000.000đ
+              {totalThuNhap} đ
             </Text>
           </HStack>
           <HStack
@@ -67,7 +116,7 @@ function MonthReportDetails() {
               Chi tiêu :
             </Text>
             <Text color={"red.600"} fontSize={16}>
-              0đ
+              {totalChiTieu} đ
             </Text>
           </HStack>
         </View>
@@ -83,41 +132,10 @@ function MonthReportDetails() {
             Thu chi :
           </Text>
           <Text ml={4} fontSize={16}>
-            3.000.000đ
+          {totalThuNhap-totalChiTieu} đ
           </Text>
         </HStack>
-        <View w={"100%"} justifyContent={"space-between"} flexDirection={"row"}>
-          <HStack
-            pl={1}
-            borderColor={"#767676"}
-            borderRadius={5}
-            borderWidth={1}
-            alignItems={"center"}
-            w={"49%"}
-          >
-            <Text color={"#767676"} fontWeight={"medium"} fontSize={12}>
-              Ban đầu :
-            </Text>
-            <Text lab color={"green.700"} fontSize={16}>
-              2.000.000đ
-            </Text>
-          </HStack>
-          <HStack
-            pl={1}
-            borderColor={"#767676"}
-            borderRadius={5}
-            borderWidth={1}
-            w={"49%"}
-            alignItems={"center"}
-          >
-            <Text color={"#767676"} fontWeight={"medium"} fontSize={12}>
-              Kết thúc :
-            </Text>
-            <Text color={"red.600"} fontSize={16}>
-              0đ
-            </Text>
-          </HStack>
-        </View>
+        
       </View>
       <ScrollView pt={2}>
         <View
