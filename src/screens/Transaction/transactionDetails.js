@@ -14,11 +14,11 @@ function TransactionDetailsScreen({ route }) {
   const navigation = useNavigation();
 
   const [editedTransaction, setEditedTransaction] = useState({
-    amount: transaction.amount || "",
-    day: transaction.day || "",
-    month: transaction.month || "",
-    year: transaction.year || "",
-    note: transaction.note || "",
+    amount: transaction?.amount || "",
+    day: transaction?.day || "",
+    month: transaction?.month || "",
+    year: transaction?.year || "",
+    note: transaction?.note || "",
   });
 
   const handleEditClick = () => {
@@ -27,18 +27,30 @@ function TransactionDetailsScreen({ route }) {
 
   const handleSaveChanges = async () => {
     try {
-      const transactionRef = doc(db, "transactions", transaction.id);
-
-      const updatedFields = {
-        amount: editedTransaction.amount,
-        day: editedTransaction.day,
-        month: editedTransaction.month,
-        year: editedTransaction.year,
-        note: editedTransaction.note,
-      };
-
+      const transactionRef = doc(db, "transaction", transaction.id);
+  
+      const updatedFields = {};
+  
+      if (editedTransaction.amount !== undefined) {
+        updatedFields.amount = editedTransaction.amount;
+      }
+      if (editedTransaction.day !== undefined) {
+        updatedFields.day = editedTransaction.day;
+      }
+      if (editedTransaction.month !== undefined) {
+        updatedFields.month = editedTransaction.month;
+      }
+      if (editedTransaction.year !== undefined) {
+        updatedFields.year = editedTransaction.year;
+      }
+      if (editedTransaction.note !== undefined) {
+        updatedFields.note = editedTransaction.note;
+      }
+  
+      console.log("Updated Fields:", updatedFields); // Logging updated fields
+  
       await updateDoc(transactionRef, updatedFields);
-
+  
       setModalVisible(false);
       console.log("Transaction updated successfully");
     } catch (error) {
@@ -52,7 +64,7 @@ function TransactionDetailsScreen({ route }) {
 
   const handleDeleteTransaction = async () => {
     try {
-      const transactionRef = doc(db, "transactions", transaction.id);
+      const transactionRef = doc(db, "transaction", transaction.id);
   
       await deleteDoc(transactionRef);
   
@@ -120,7 +132,7 @@ function TransactionDetailsScreen({ route }) {
             <View flex={1} flexDirection="row" alignItems="center" justifyContent="space-between">
               <View alignItems="center" flexDirection="row">
                 <Text fontWeight="medium" ml={4}>
-                  Loại giao dịch: {transaction.category}
+                  Loại giao dịch: {transaction.transactionType}
                 </Text>
               </View>
             </View>
@@ -194,7 +206,7 @@ function TransactionDetailsScreen({ route }) {
               value={editedTransaction.note}
               onChangeText={(value) =>
                 setEditedTransaction((prev) => ({
-                 ...prev,
+                  ...prev,
                   note: value,
                 }))
               }

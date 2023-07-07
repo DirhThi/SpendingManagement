@@ -102,7 +102,7 @@ const updateEmailInWallet = async (mathe, password, email) => {
   }
 };
 
-const updatePasswordFunction = async (currentPassword, newPassword) => {
+export const updatePasswordFunction = async (currentPassword, newPassword) => {
   try {
     const user = auth.currentUser;
     const credential = EmailAuthProvider.credential(user.email, currentPassword);
@@ -203,5 +203,5 @@ export const getTienMat = async () => {
     console.log('Lỗi khi truy xuất giá trị tienmat:', error);
   }
 };
-export { auth, createAccount, login, updateProfile, signOut, updateEmailInWallet, updatePasswordFunction };
+export { auth, createAccount, login, updateProfile, signOut, updateEmailInWallet};
 export { db };
